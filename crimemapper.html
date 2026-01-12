@@ -9668,27 +9668,38 @@ function exportToExcel() {
 
 const throttledEnrichGoogleDNS = throttleRequest(async function enrichGoogleDNS(domain, domainNodeId, isBulk = false, signal) {
     if (!isBulk) network.setOptions({ physics: { enabled: false } });
+
+    // ── Validation & cleaning ─────────────────────────────
+    if (!domain || typeof domain !== 'string' || domain.trim() === '') {
+        if (!isBulk) showToast('Skipping: empty or invalid domain', 'warning');
+        return;
+    }
+    const cleanDomain = domain.trim();
+
     try {
-        const baseUrl = `https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=A`;
-        const url = constructUrl(baseUrl, false); // No API key needed for Google DNS
-        console.log(`Fetching A records for ${domain}: ${url}`); // Debug log
+        // ── Direct URL (bypasses constructUrl/proxy) ───────
+        const url = `https://dns.google/resolve?name=${encodeURIComponent(cleanDomain)}&type=A`;
+        console.log(`Fetching A records for ${cleanDomain}: ${url}`);
+
         const response = await fetch(url, { signal });
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`Failed to fetch DNS data: ${response.status} ${response.statusText} - ${errorText}`);
         }
+
         const data = await response.json();
-        
+
         if (data.Status !== 0) {
             throw new Error(`Google DNS error: Status ${data.Status}${data.Comment ? ` (${data.Comment})` : ''}`);
         }
-        
+
         if (data.Answer) {
             data.Answer.forEach(answer => {
                 if (answer.type === 1) { // Type 1 is A record (IPv4)
-                    const ip = answer.data;
+                    const ip = answer.data.trim();
                     const existingIP = nodes.get({ filter: n => n.type === 'ip' && n.ip === ip })[0];
                     const ipId = existingIP ? existingIP.id : nextId++;
+
                     if (!existingIP) {
                         nodes.add({
                             id: ipId,
@@ -9700,6 +9711,7 @@ const throttledEnrichGoogleDNS = throttleRequest(async function enrichGoogleDNS(
                             size: 20
                         });
                     }
+
                     const edgeId = `${domainNodeId}-${ipId}-ResolvesTo`;
                     if (!edges.get(edgeId)) {
                         edges.add({ id: edgeId, from: domainNodeId, to: ipId, label: 'Resolves to' });
@@ -9707,22 +9719,23 @@ const throttledEnrichGoogleDNS = throttleRequest(async function enrichGoogleDNS(
                 }
             });
         } else {
-            if (!isBulk) showToast(`No A records found for ${domain}`, 'info');
+            if (!isBulk) showToast(`No A records found for ${cleanDomain}`, 'info');
         }
-        
+
         updateNodeSizes();
         updateSelectOptions();
+
         if (!isBulk) {
             await stabilizeNetwork();
-            showToast(`Domain ${domain} enrichment completed using Google DNS`, 'success');
+            showToast(`Domain ${cleanDomain} enrichment completed using Google DNS`, 'success');
         }
     } catch (error) {
         if (error.name === 'AbortError') {
-            showToast(`A record enrichment of domain ${domain} cancelled`, 'info');
+            showToast(`A record enrichment of domain ${cleanDomain} cancelled`, 'info');
             return;
         }
-        console.error(`Error enriching domain ${domain} with Google DNS: ${error.message}`);
-        showToast(`Error enriching domain ${domain} with Google DNS: ${error.message}`, 'error');
+        console.error(`Error enriching domain ${cleanDomain} with Google DNS: ${error.message}`);
+        showToast(`Error enriching domain ${cleanDomain} with Google DNS: ${error.message}`, 'error');
         if (!isBulk) await stabilizeNetwork();
     }
 }, RATE_LIMIT_MS);
