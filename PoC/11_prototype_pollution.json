@@ -1,0 +1,19 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "ip",
+      "ip": "192.168.1.1",
+      "__proto__": {
+        "polluted": true,
+        "isAdmin": true
+      },
+      "constructor": {
+        "prototype": {
+          "polluted": true
+        }
+      }
+    }
+  ],
+  "edges": []
+}

