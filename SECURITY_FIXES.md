@@ -75,7 +75,9 @@ echo "73686f64616e3a414243313233" | xxd -r -p
 
 ## Remediation Applied (This Fork)
 
-This fork contains fixes for all identified vulnerabilities:
+This security research fork demonstrates fixes for all identified vulnerabilities. These patches are offered to the upstream maintainer for consideration.
+
+### Security Fixes Applied
 
 | Vulnerability | Fix Applied |
 |---------------|-------------|
@@ -85,6 +87,15 @@ This fork contains fixes for all identified vulnerabilities:
 | Prototype Pollution | `FORBIDDEN_KEYS` filter on object merges |
 | Missing CSP | Added strict `connect-src` whitelist |
 | No Import Warning | User confirmation dialog before import |
+
+### Bug Fixes (also affecting upstream)
+
+The upstream version contains JavaScript errors that affect functionality:
+
+| Bug | Error Message | Fix |
+|-----|---------------|-----|
+| Dead event handlers | `handleMouseDown is not defined` | Removed orphaned listeners |
+| Broken JSON import | `fileInput is null` | Dynamic file input creation |
 
 ---
 
